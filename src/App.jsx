@@ -1,12 +1,7 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import MovieTicket from "./MovieTicket";
+import MovieTicket from "./components/MovieTicket";
 
-export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/ticket/:ticketToken" element={<MovieTicket />} />
-      </Routes>
-    </BrowserRouter>
-  );
+function App() {
+  return <MovieTicket />;
 }
+
+export default App;
