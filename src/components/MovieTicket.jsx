@@ -239,11 +239,11 @@ export default function MovieTicket() {
                   <div className="seat-badges">
 
                     <span className="seat-badge">
-                      E22
+                      D2
                     </span>
 
                     <span className="seat-badge">
-                    E23
+                    D3
                     </span>
 
                   </div>
