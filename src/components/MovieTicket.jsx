@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import "./MovieTicket.css";
-
+import accessibilityBanner from "../assets/accessibility-banner.jpeg";
 import pvrLogo from "../assets/pvr-inox-logo.svg";
 
 import posterDC from "../assets/poster-dc.jpg";
@@ -309,6 +309,16 @@ export default function MovieTicket() {
               RECOMMENDED MOVIES
               INSIDE OUTER CARD
           ================================================= */}
+{/* =================================================
+    ACCESSIBILITY BANNER
+================================================= */}
+
+<div className="accessibility-banner">
+  <img
+    src={accessibilityBanner}
+    alt="Cinema accessibility features"
+  />
+</div>
 
           <section className="recommended-section">
 
