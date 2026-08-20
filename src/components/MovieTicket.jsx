@@ -120,12 +120,12 @@ export default function MovieTicket() {
   const [ticketId, setTicketId] = useState("");
   const [qrValue, setQrValue] = useState("");
 
-useEffect(() => {
-  const id = urlTicketId || generateTicketId();
+  useEffect(() => {
+    const id = generateTicketId();
 
-  setTicketId(id);
-  setQrValue(generateQrValue(id));
-}, [urlTicketId]);
+    setTicketId(id);
+    setQrValue(generateQrValue(id));
+  }, []);
 
   return (
     <main className="ticket-page">
