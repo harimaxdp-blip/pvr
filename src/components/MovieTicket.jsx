@@ -38,17 +38,14 @@ function generateTicketId() {
 /* =========================================================
    QR VALUE
 ========================================================= */
-
 function generateQrValue(ticketId) {
   const random = Math.random()
     .toString(36)
-    .slice(2, 10)
+    .slice(2, 8)
     .toUpperCase();
 
-  return `PVRINOX-TICKET-${ticketId}-${random}`;
+  return `PVRINOX-MOVIE-TICKET-${ticketId}-${random}-M13-M14-M15-SCREEN2-31JUL-1PM`;
 }
-
-
 /* =========================================================
    RECOMMENDED MOVIES
 ========================================================= */
@@ -264,17 +261,15 @@ export default function MovieTicket() {
               <div className="qr-row">
 
                 <div className="qr-box">
-
-                  {qrValue && (
-                    <QRCodeSVG
-                      value={qrValue}
-                      size={230}
-                      level="M"
-                      includeMargin={false}
-                    />
-                  )}
-
-                </div>
+  {qrValue && (
+    <QRCodeSVG
+      value={qrValue}
+      size={230}
+      level="M"
+      includeMargin={false}
+    />
+  )}
+</div>
 
 
                 <div className="ticket-id-block">
