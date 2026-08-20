@@ -53,32 +53,12 @@ a {
 
 
 /* =========================================================
-   TICKET CONTAINER  (NEW)
-
-   Wraps the card + promo banner + footer. This is the single
-   source of truth for "how big is the ticket right now" — its
-   own rendered width is what every @container query below
-   reacts to, instead of the raw browser viewport.
-
-   Why this matters: the old code used @media (viewport width)
-   to decide when to switch to "mobile" font sizes / badge
-   sizes, but the card's own width was capped independently at
-   430px. On zoom, the viewport's CSS-pixel width can cross a
-   mobile breakpoint *before* the card has actually gotten any
-   smaller — so "mobile-sized" badges got dropped into a
-   still-full-size card and overflowed onto a second line.
-
-   Binding the breakpoints to this container instead means the
-   bigger/tighter styles only ever kick in once the card itself
-   has actually shrunk that far — no more dead zone, no more
-   wrapping, and it now scales exactly the same way whether the
-   card is small because of a narrow phone or because of
-   browser zoom.
+   TICKET CONTAINER
 ========================================================= */
 
 .ticket-container {
   width: 100%;
-  max-width: 430px;
+  max-width: 420px;
 
   margin: 0 auto;
 
@@ -94,21 +74,16 @@ a {
 /* =========================================================
    MAIN OUTER CARD
 ========================================================= */
-
 .ticket-card {
   width: 100%;
-
   background: #ffffff;
-
   border-radius: 21px;
-
   overflow: visible;
   position: relative;
 
-  box-shadow:
-  0 7px 26px rgba(0, 0, 0, 0.18);
+  /* shadow only downward */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
-
 
 /* =========================================================
    HEADER
@@ -122,7 +97,7 @@ a {
   justify-content: center;
 
   background: #f8f6f6;
-  padding: clamp(14px, 8cqi, 20px) 10px clamp(10px, 5cqi, 14px);
+  padding: clamp(16px, 8cqi, 22px) 10px clamp(4px, 2cqi, 8px);
 
   border-bottom: 1px solid #dddddd;
   border-radius: 21px 21px 0 0;
@@ -159,7 +134,7 @@ a {
 .ticket-body {
   width: 100%;
 
-  padding: 8px 5px 0;
+  padding: 8px 5px 4px;
 
   background: #F8F6F6;
 }
@@ -174,11 +149,11 @@ a {
   max-width: 100%;
   min-width: 0;
 
-  padding: 20px clamp(8px, 3cqi, 12px) 12px;
+  padding: 22px clamp(10px, 3.5cqi, 14px) 16px;
 
   background: #f8f6f6;
   border: 1px solid #e6e5e3;
-  border-radius: 10px;
+  border-radius: 5px;
 
   box-sizing: border-box;
   overflow: hidden;
@@ -190,7 +165,7 @@ a {
 ========================================================= */
 
 .theatre-name {
-  margin: 0 0 4px;
+  margin: 0 0 6px;
 
   font-family: "Poppins", Arial, sans-serif;
   font-size: clamp(10px, 4cqi, 14px);
@@ -208,7 +183,7 @@ a {
   max-width: 100%;
   min-width: 0;
 
-  margin: 0 0 12px;
+  margin: 0 0 16px;
   padding: 0 4px;
 
   font-family: "Poppins", Arial, sans-serif;
@@ -229,7 +204,7 @@ a {
 ========================================================= */
 
 .movie-title {
-  margin: 0 0 3px;
+  margin: 0 0 4px;
 
   font-family: "Poppins", Arial, sans-serif;
   font-size: clamp(12px, 4cqi, 15px);
@@ -242,7 +217,7 @@ a {
 }
 
 .movie-rating {
-  margin: 0 0 12px;
+  margin: 0 0 16px;
 
   font-family: "Poppins", Arial, sans-serif;
   font-size: clamp(12px, 3.6cqi, 14px);
@@ -262,15 +237,13 @@ a {
 .info-row {
   width: 100%;
 
-  padding: 8px 0;
-
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: flex-start;
 
   column-gap: 12px;
-  row-gap: 8px;
+  row-gap: 6px;
 
   border: 0;
 }
@@ -283,7 +256,7 @@ a {
   align-items: flex-start;
   text-align: left;
 
-  gap: 3px;
+  gap: 4px;
 }
 .info-block.align-right {
   align-items: flex-end;
@@ -297,8 +270,7 @@ a {
   font-family: "Poppins", Arial, sans-serif;
   font-size: clamp(10px, 3cqi, 11px);
   line-height: 1.2;
-  font-weight: 400;
-
+  font-weight: 600;
   color: #747b88;
 }
 
@@ -317,15 +289,17 @@ a {
 ========================================================= */
 
 .screen-row {
-  padding-top: 8px;
-  padding-bottom: 5px;
+  padding-top: 10px;
+  padding-bottom: 8px;
+  border-top: none;
+  margin-top: 4px;
 }
 
 .seat-badges {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  flex-wrap: nowrap;   /* never let badges drop to a new line */
+  flex-wrap: nowrap;
 
   gap: clamp(4px, 2cqi, 7px);
 
@@ -334,9 +308,6 @@ a {
 }
 
 .seat-badge {
-  /* No fixed min-width: badges are allowed to compress their
-     own padding/font before anything is allowed to wrap, so
-     three seats always fit on one line at any card size. */
   flex: 0 1 auto;
   min-width: 0;
   height: clamp(24px, 9cqi, 29px);
@@ -362,24 +333,19 @@ a {
 
 /* =========================================================
    QR SECTION
-
-   Square at every size (the old fixed 70x120 box only became
-   square once a media query happened to override it — now it
-   is always square, scaling with the card).
 ========================================================= */
 
 .qr-row {
   width: 100%;
 
-  padding: 10px 0 3px;
+  padding: 16px 0 8px;
+  margin-top: 4px;
 
   display: flex;
   align-items: center;
   flex-wrap: wrap;
 
   gap: clamp(15px, 6cqi, 25px);
-
-  border: 0;
 }
 
 .qr-box {
@@ -400,13 +366,14 @@ a {
 
   overflow: hidden;
 }
+
 /* =========================================================
    ACCESSIBILITY BANNER
 ========================================================= */
 
 .accessibility-banner {
   width: 100%;
-  margin: 0;
+  margin: 18px 0 0;
   padding: 0 10px;
 
   background: #ffffff;
@@ -437,7 +404,7 @@ a {
   align-items: flex-start;
   justify-content: center;
 
-  gap: 2px;
+  gap: 3px;
   text-align: left;
 }
 
@@ -467,7 +434,7 @@ a {
   align-items: flex-start;
   gap: 6px;
 
-  margin: 0;
+  margin: 12px 0 4px;
 
   padding: 0 6px;
 
@@ -506,7 +473,7 @@ a {
 .recommended-section {
   width: 100%;
   margin: 0;
-  padding: 10px clamp(13px, 4cqi, 18px) clamp(24px, 8cqi, 30px);
+  padding: 20px clamp(13px, 4cqi, 18px) clamp(24px, 8cqi, 30px);
 
   background: #ffffff;
 
@@ -514,7 +481,7 @@ a {
 }
 
 .recommended-title {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
 
   font-family: "Poppins", Arial, sans-serif;
   font-size: clamp(16px, 5.6cqi, 19px);
@@ -578,7 +545,7 @@ a {
 .promo-banner {
   width: 100%;
 
-  margin-top: 14px;
+  margin-top: 18px;
 
   padding: 0;
 
@@ -679,11 +646,6 @@ a {
 
 /* =========================================================
    CONTAINER-QUERY TIERS
-
-   Bound to the ticket card's OWN width (max 430px), not the
-   browser viewport. These only fire once the card has really
-   gotten that small, so styling and layout always match what
-   you can actually see — no more dead zone during zoom.
 ========================================================= */
 
 @container ticket (max-width: 400px) {
@@ -716,9 +678,6 @@ a {
   }
 }
 
-/* Fallback for browsers without container query support:
-   the clamp()-based fluid sizing above already scales smoothly
-   with the card's rendered width even without this block. */
 @supports not (container-type: inline-size) {
   .ticket-container {
     container-type: normal;
