@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MovieTicket from "./components/MovieTicket";
 
@@ -6,7 +7,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/ticket/:ticketId" element={<MovieTicket />} />
-        <Route path="/" element={<MovieTicket />} />
+        <Route
+  path="/"
+  element={<Navigate to="/ticket/(iR8PHEN)y54KYkbuvJ6Ag==" replace />}
+/>
       </Routes>
     </BrowserRouter>
   );
