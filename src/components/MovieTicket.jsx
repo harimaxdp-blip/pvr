@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { useParams } from "react-router-dom";
 import "./MovieTicket.css";
 import accessibilityBanner from "../assets/accessibility-banner.jpeg";
 import pvrLogo from "../assets/pvr-inox-logo.svg";
@@ -114,15 +115,17 @@ const ICONS = {
 ========================================================= */
 
 export default function MovieTicket() {
+  const { ticketId: urlTicketId } = useParams();
+
   const [ticketId, setTicketId] = useState("");
   const [qrValue, setQrValue] = useState("");
 
-  useEffect(() => {
-    const id = generateTicketId();
+useEffect(() => {
+  const id = urlTicketId || generateTicketId();
 
-    setTicketId(id);
-    setQrValue(generateQrValue(id));
-  }, []);
+  setTicketId(id);
+  setQrValue(generateQrValue(id));
+}, [urlTicketId]);
 
   return (
     <main className="ticket-page">
