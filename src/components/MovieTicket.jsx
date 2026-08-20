@@ -6,8 +6,8 @@ import pvrLogo from "../assets/pvr-inox-logo.svg";
 
 import posterDC from "../assets/poster-dc.jpg";
 import posterVishwanath from "../assets/poster-vishwanath.jpg";
-import posterGDN from "../assets/poster-gdn.jpg";
-import posterMakutam from "../assets/poster-makutam.jpg";
+import posterGDN from "../assets/1.avif";
+import posterMakutam from "../assets/2.webp";
 import posterSpiderman from "../assets/poster-spiderman.jpg";
 
 
@@ -53,7 +53,7 @@ function generateQrValue(ticketId) {
 const recommendedMovies = [
   {
     title: "DC",
-    image: posterDC,
+    image: posterSpiderman,
   },
   {
     title: "Vishwanath & Sons",
@@ -176,14 +176,14 @@ export default function MovieTicket() {
               {/* MOVIE */}
 
               <h2 className="movie-title">
-                SPIDERMAN BRAND NEW DAY (3D TAMIL) (T.B.A)
+                DC (Tamil with English Subtitle) (T.B.A)
               </h2>
-
+{/* MOVIE 
               <p className="movie-rating">
                 Tamil UA 13+
               </p>
 
-
+*/}
               {/* DATE / TIME */}
 
               <div className="info-row">
@@ -194,7 +194,7 @@ export default function MovieTicket() {
                   </span>
 
                   <span className="info-value">
-                    Fri, 31 Jul
+                    Thu, 20 Aug
                   </span>
                 </div>
 
@@ -205,7 +205,7 @@ export default function MovieTicket() {
                   </span>
 
                   <span className="info-value">
-                    1:00 PM - 4:05 PM
+                    10:20 PM - 1:24 AM
                   </span>
                 </div>
 
@@ -222,7 +222,7 @@ export default function MovieTicket() {
                   </span>
 
                   <span className="info-value">
-                    SCREEN-2
+                    SCREEN-5
                   </span>
                 </div>
 
@@ -236,15 +236,11 @@ export default function MovieTicket() {
                   <div className="seat-badges">
 
                     <span className="seat-badge">
-                      M13
+                      E22
                     </span>
 
                     <span className="seat-badge">
-                      M14
-                    </span>
-
-                    <span className="seat-badge">
-                      M15
+                    E23
                     </span>
 
                   </div>
@@ -354,7 +350,7 @@ export default function MovieTicket() {
         <div className="promo-banner">
 
           <img
-            src={posterSpiderman}
+            src={posterDC}
             alt="Spiderman Brand New Day"
           />
 
