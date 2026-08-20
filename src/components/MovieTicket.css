@@ -15,11 +15,12 @@ body,
   padding: 0;
   width: 100%;
   min-height: 100%;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
-  background: #ffffff;
+  background: #f8f6f6;
   font-family: "Poppins", Arial, sans-serif;
   color: #14213d;
   -webkit-font-smoothing: antialiased;
@@ -38,6 +39,7 @@ a {
 .ticket-page {
   width: 100%;
   min-height: 100vh;
+  max-width: 100vw;
 
   padding: 30px 20px 50px;
 
@@ -45,31 +47,66 @@ a {
   flex-direction: column;
   align-items: center;
 
-  background: #ffffff;
+  background: #f8f6f6;
+  overflow-x: hidden;
+}
+
+
+/* =========================================================
+   TICKET CONTAINER  (NEW)
+
+   Wraps the card + promo banner + footer. This is the single
+   source of truth for "how big is the ticket right now" — its
+   own rendered width is what every @container query below
+   reacts to, instead of the raw browser viewport.
+
+   Why this matters: the old code used @media (viewport width)
+   to decide when to switch to "mobile" font sizes / badge
+   sizes, but the card's own width was capped independently at
+   430px. On zoom, the viewport's CSS-pixel width can cross a
+   mobile breakpoint *before* the card has actually gotten any
+   smaller — so "mobile-sized" badges got dropped into a
+   still-full-size card and overflowed onto a second line.
+
+   Binding the breakpoints to this container instead means the
+   bigger/tighter styles only ever kick in once the card itself
+   has actually shrunk that far — no more dead zone, no more
+   wrapping, and it now scales exactly the same way whether the
+   card is small because of a narrow phone or because of
+   browser zoom.
+========================================================= */
+
+.ticket-container {
+  width: 100%;
+  max-width: 430px;
+
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  container-type: inline-size;
+  container-name: ticket;
 }
 
 
 /* =========================================================
    MAIN OUTER CARD
-
-   IMPORTANT:
-   Recommended Movies stay INSIDE this card.
-   Therefore the outer border continues around them.
 ========================================================= */
 
 .ticket-card {
-  width: 620px;
-  max-width: 100%;
+  width: 100%;
 
   background: #ffffff;
 
-  border: 1px solid #e8e8e8;
   border-radius: 21px;
 
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
 
   box-shadow:
-    0 7px 26px rgba(0, 0, 0, 0.09);
+  0 7px 26px rgba(0, 0, 0, 0.18);
 }
 
 
@@ -79,20 +116,38 @@ a {
 
 .ticket-header {
   width: 100%;
-  height: 73px;
 
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
 
-  background: #ffffff;
+  background: #f8f6f6;
+  padding: clamp(14px, 8cqi, 20px) 10px clamp(10px, 5cqi, 14px);
 
   border-bottom: 1px solid #dddddd;
+  border-radius: 21px 21px 0 0;
+
+  position: relative;
+}
+
+.ticket-header::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 46px;
+  height: 14px;
+
+  border-radius: 0 0 10px 10px;
 }
 
 .ticket-logo {
+  padding-top: 11px;
+  height: auto;
   width: auto;
-
+  max-width: 80%;
   display: block;
 }
 
@@ -106,7 +161,7 @@ a {
 
   padding: 8px 5px 0;
 
-  background: #ffffff;
+  background: #F8F6F6;
 }
 
 
@@ -116,13 +171,17 @@ a {
 
 .ticket-inner {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 
-  padding: 20px 12px 12px;
+  padding: 20px clamp(8px, 3cqi, 12px) 12px;
 
-  background: #ffffff;
+  background: #f8f6f6;
+  border: 1px solid #e6e5e3;
+  border-radius: 10px;
 
-  border: 3px solid #dfe3e5;
-  border-radius: 7px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 
@@ -131,10 +190,10 @@ a {
 ========================================================= */
 
 .theatre-name {
-  margin: 0 0 5px;
+  margin: 0 0 4px;
 
   font-family: "Poppins", Arial, sans-serif;
-  font-size: 15px;
+  font-size: clamp(10px, 4cqi, 14px);
   line-height: 1.35;
   font-weight: 700;
   letter-spacing: 0;
@@ -145,18 +204,23 @@ a {
 }
 
 .theatre-address {
-  margin: 0 0 15px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 
-  padding: 0 8px;
+  margin: 0 0 12px;
+  padding: 0 4px;
 
   font-family: "Poppins", Arial, sans-serif;
-  font-size: 13px;
+  font-size: clamp(8px, 2.8cqi, 12px);
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: 500;
 
   color: #727887;
+  text-align: center !important;
 
-  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 
@@ -165,10 +229,10 @@ a {
 ========================================================= */
 
 .movie-title {
-  margin: 0 0 4px;
+  margin: 0 0 3px;
 
   font-family: "Poppins", Arial, sans-serif;
-  font-size: 15px;
+  font-size: clamp(12px, 4cqi, 15px);
   line-height: 1.35;
   font-weight: 700;
 
@@ -178,10 +242,10 @@ a {
 }
 
 .movie-rating {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
 
   font-family: "Poppins", Arial, sans-serif;
-  font-size: 14px;
+  font-size: clamp(12px, 3.6cqi, 14px);
   line-height: 1.3;
   font-weight: 700;
 
@@ -201,8 +265,12 @@ a {
   padding: 8px 0;
 
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   align-items: flex-start;
+
+  column-gap: 12px;
+  row-gap: 8px;
 
   border: 0;
 }
@@ -220,11 +288,14 @@ a {
 .info-block.align-right {
   align-items: flex-end;
   text-align: right;
+  margin-left: auto;
+  min-width: 0;
+  max-width: 60%;
 }
 
 .info-label {
   font-family: "Poppins", Arial, sans-serif;
-  font-size: 12px;
+  font-size: clamp(10px, 3cqi, 11px);
   line-height: 1.2;
   font-weight: 400;
 
@@ -233,7 +304,7 @@ a {
 
 .info-value {
   font-family: "Poppins", Arial, sans-serif;
-  font-size: 14px;
+  font-size: clamp(12px, 3.6cqi, 13px);
   line-height: 1.25;
   font-weight: 600;
 
@@ -254,17 +325,23 @@ a {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: nowrap;   /* never let badges drop to a new line */
 
-  gap: 7px;
+  gap: clamp(4px, 2cqi, 7px);
 
   margin-top: 2px;
+  max-width: 100%;
 }
 
 .seat-badge {
-  min-width: 38px;
-  height: 31px;
+  /* No fixed min-width: badges are allowed to compress their
+     own padding/font before anything is allowed to wrap, so
+     three seats always fit on one line at any card size. */
+  flex: 0 1 auto;
+  min-width: 0;
+  height: clamp(24px, 9cqi, 29px);
 
-  padding: 4px 6px;
+  padding: clamp(2px, 1.4cqi, 4px) clamp(4px, 2cqi, 6px);
 
   display: inline-flex;
   align-items: center;
@@ -276,18 +353,19 @@ a {
   border-radius: 5px;
 
   font-family: "Poppins", Arial, sans-serif;
-  font-size: 14px;
+  font-size: clamp(10.5px, 3.4cqi, 12px);
   line-height: 1;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 
 /* =========================================================
    QR SECTION
 
-   Reference layout:
-   QR on LEFT
-   Ticket ID on RIGHT
+   Square at every size (the old fixed 70x120 box only became
+   square once a media query happened to override it — now it
+   is always square, scaling with the card).
 ========================================================= */
 
 .qr-row {
@@ -297,24 +375,27 @@ a {
 
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 
-  gap: 25px;
+  gap: clamp(15px, 6cqi, 25px);
 
   border: 0;
 }
 
 .qr-box {
-  width: 180px;
-  height: 180px;
-  padding: 7px;
-  flex: 0 0 228px;
+  width: clamp(120px, 34cqi, 120px);
+  aspect-ratio: 1 / 1;
+  height: auto;
+
+  padding: clamp(6px, 2.4cqi, 10px);
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #ffffff;
 
   border: none;
-  outline: none;
+  border-radius: 0;
   box-shadow: none;
 
   overflow: hidden;
@@ -329,48 +410,51 @@ a {
 }
 
 .ticket-id-block {
-  min-width: 0;
+  width: 20px;
+  min-width: 90px;
+  flex: 0 0 90px;
 
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  text-align: left;
+  justify-content: center;
 
   gap: 2px;
+  text-align: left;
 }
 
 .ticket-id-block .info-label {
-  font-size: 11px;
+  font-size: clamp(10px, 3cqi, 11px);
   line-height: 1.2;
   text-align: left;
 }
 
-.ticket-id-block .info-value {
-  font-size: 1px;
-  line-height: 1.25;
+.ticket-id-value {
+  font-size: clamp(13px, 4cqi, 13px);
+  line-height: 1.2;
   font-weight: 500;
-  text-align: left;
-}
+  color: #000101;
 
+  white-space: nowrap;
+}
 
 /* =========================================================
    NOTE
-
-   NO BULLET
-   NO DASHED LINE
 ========================================================= */
 
 .ticket-note {
   position: relative;
 
-  display: block;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
 
   margin: 0;
 
-  padding: 0 8px;
+  padding: 0 6px;
 
   font-family: "Poppins", Arial, sans-serif;
-  font-size: 12px;
+  font-size: clamp(10px, 3cqi, 11px);
   line-height: 1.45;
   font-weight: 400;
 
@@ -381,7 +465,16 @@ a {
   list-style: none;
 }
 
-.ticket-note::before,
+.ticket-note::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 4px;
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: #071a31;
+}
+
 .ticket-note::after {
   content: none !important;
   display: none !important;
@@ -390,8 +483,6 @@ a {
 
 /* =========================================================
    RECOMMENDED MOVIES
-
-   STILL INSIDE OUTER CARD
 ========================================================= */
 
 .recommended-section {
@@ -399,16 +490,18 @@ a {
 
   margin: 0;
 
-  padding: 47px 18px 31px;
+  padding: clamp(30px, 12cqi, 47px) clamp(13px, 4cqi, 18px) clamp(24px, 8cqi, 30px);
 
   background: #ffffff;
+
+  border-radius: 0 0 21px 21px;
 }
 
 .recommended-title {
-  margin: 0 0 14px;
+  margin: 0 0 12px;
 
   font-family: "Poppins", Arial, sans-serif;
-  font-size: 20px;
+  font-size: clamp(16px, 5.6cqi, 19px);
   line-height: 1.25;
   font-weight: 700;
 
@@ -419,8 +512,7 @@ a {
 
 
 /* =========================================================
-   4 MOVIES
-   2 COLUMNS × 2 ROWS
+   4 MOVIES — 2 COLUMNS x 2 ROWS
 ========================================================= */
 
 .recommended-grid {
@@ -430,7 +522,7 @@ a {
 
   grid-template-columns: repeat(2, minmax(0, 1fr));
 
-  gap: 14px;
+  gap: clamp(9px, 3.2cqi, 14px);
 }
 
 
@@ -465,12 +557,10 @@ a {
 
 /* =========================================================
    PROMO
-   OUTSIDE MAIN CARD
 ========================================================= */
 
 .promo-banner {
-  width: 620px;
-  max-width: 100%;
+  width: 100%;
 
   margin-top: 14px;
 
@@ -496,16 +586,15 @@ a {
 ========================================================= */
 
 .ticket-footer {
-  width: 620px;
-  max-width: 100%;
+  width: 100%;
 
-  padding: 34px 10px 15px;
+  padding: clamp(28px, 10cqi, 34px) 10px clamp(12px, 5cqi, 15px);
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  gap: 30px;
+  gap: clamp(24px, 8cqi, 30px);
 }
 
 
@@ -518,8 +607,9 @@ a {
 
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
 
-  gap: 27px;
+  gap: clamp(20px, 8cqi, 27px);
 }
 
 .footer-icons a {
@@ -545,7 +635,6 @@ a {
 
 /* =========================================================
    FOOTER LINKS
-   EXACT 3-COLUMN ALIGNMENT
 ========================================================= */
 
 .footer-links {
@@ -560,7 +649,7 @@ a {
   text-align: center;
 
   font-family: Arial, sans-serif;
-  font-size: 15px;
+  font-size: clamp(11px, 4cqi, 15px);
 }
 
 .footer-links a {
@@ -573,289 +662,49 @@ a {
 
 
 /* =========================================================
-   TABLET
+   CONTAINER-QUERY TIERS
+
+   Bound to the ticket card's OWN width (max 430px), not the
+   browser viewport. These only fire once the card has really
+   gotten that small, so styling and layout always match what
+   you can actually see — no more dead zone during zoom.
 ========================================================= */
 
-@media (max-width: 700px) {
-
-  .ticket-page {
-    padding: 20px 10px 40px;
-  }
-
-  .ticket-card {
-    width: 100%;
-    max-width: 540px;
-  }
-
-  .ticket-header {
-    height: 76px;
-  }
-
-  .ticket-logo {
-    height: 30px;
-  }
+@container ticket (max-width: 400px) {
 
   .ticket-inner {
-    padding: 20px 11px 12px;
+    border-radius: 7px;
   }
 
-  .theatre-name {
-    font-size: 16px;
-  }
-
-  .theatre-address {
-    font-size: 13px;
-    padding: 0 5px;
-  }
-
-  .movie-title {
-    font-size: 15px;
-  }
-
-  .movie-rating {
-    font-size: 14px;
-  }
-
-  .qr-row {
-    gap: 20px;
-  }
-
-  .qr-box {
-    width: 210px;
-    height: 210px;
-    flex-basis: 210px;
-  }
-
-  .recommended-section {
-    padding: 46px 18px 30px;
-  }
-
-  .promo-banner,
-  .ticket-footer {
-    width: 100%;
-    max-width: 540px;
+  .ticket-note {
+    padding-left: 5px;
   }
 }
 
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 560px) {
-
-  .ticket-page {
-    padding: 18px 7px 35px;
-  }
+@container ticket (max-width: 340px) {
 
   .ticket-card {
-    width: 100%;
     border-radius: 19px;
   }
 
   .ticket-header {
-    height: 78px;
-  }
-
-  .ticket-logo {
-    height: 30px;
-  }
-
-  .ticket-body {
-    padding: 8px 5px 0;
-  }
-
-  .ticket-inner {
-    padding: 20px 10px 12px;
-    border-width: 3px;
-    border-radius: 7px;
-  }
-
-  .theatre-name {
-    font-size: 15px;
-    margin-bottom: 6px;
-  }
-
-  .theatre-address {
-    font-size: 12px;
-    line-height: 1.5;
-    padding: 0 3px;
-    margin-bottom: 14px;
-  }
-
-  .movie-title {
-    font-size: 14px;
-    line-height: 1.35;
-  }
-
-  .movie-rating {
-    font-size: 13px;
-    margin-bottom: 15px;
-  }
-
-  .info-row {
-    padding: 8px 0;
-  }
-
-  .info-label {
-    font-size: 11px;
-  }
-
-  .info-value {
-    font-size: 13px;
-  }
-
-  .seat-badges {
-    gap: 5px;
-  }
-
-  .seat-badge {
-    min-width: 37px;
-    height: 29px;
-    padding: 4px 6px;
-    font-size: 12px;
-  }
-
-  .qr-row {
-    padding-top: 10px;
-    gap: 15px;
-  }
-
-  .qr-box {
-    width: 180px;
-    height: 180px;
-    flex-basis: 180px;
-    padding: 6px;
-  }
-
-  .ticket-id-block {
-    gap: 2px;
-  }
-
-  .ticket-id-block .info-label {
-    font-size: 11px;
-  }
-
-  .ticket-id-block .info-value {
-    font-size: 13px;
-  }
-
-  .ticket-note {
-    font-size: 11px;
-    padding-left: 5px;
+    border-radius: 19px 19px 0 0;
   }
 
   .recommended-section {
-    padding: 47px 16px 28px;
+    border-radius: 0 0 19px 19px;
   }
 
-  .recommended-title {
-    font-size: 19px;
-    margin-bottom: 13px;
-  }
-
-  .recommended-grid {
-    gap: 12px;
-  }
-
-  .recommended-card {
-    border-radius: 7px;
-  }
-
-  .promo-banner {
-    padding: 0;
-    margin-top: 13px;
-  }
-
-  .ticket-footer {
-    padding: 30px 8px 12px;
-    gap: 28px;
-  }
-
-  .footer-icons {
-    gap: 24px;
-  }
-
-  .footer-links {
-    font-size: 13px;
+  .qr-row {
+    gap: clamp(10px, 5cqi, 15px);
   }
 }
 
-
-/* =========================================================
-   SMALL PHONE
-========================================================= */
-
-@media (max-width: 390px) {
-
-  .ticket-page {
-    padding-left: 5px;
-    padding-right: 5px;
-  }
-
-  .ticket-inner {
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-
-  .theatre-name {
-    font-size: 14px;
-  }
-
-  .theatre-address {
-    font-size: 11px;
-  }
-
-  .movie-title {
-    font-size: 13px;
-  }
-
-  .movie-rating {
-    font-size: 12px;
-  }
-
-  .info-label {
-    font-size: 10px;
-  }
-
-  .info-value {
-    font-size: 12px;
-  }
-
-  .seat-badge {
-    min-width: 34px;
-    height: 27px;
-    font-size: 11px;
-  }
-
-  .qr-row {
-    gap: 10px;
-  }
-
-  .qr-box {
-    width: 150px;
-    height: 150px;
-    flex-basis: 150px;
-  }
-
-  .ticket-note {
-    font-size: 10px;
-  }
-
-  .recommended-section {
-    padding-left: 13px;
-    padding-right: 13px;
-  }
-
-  .recommended-title {
-    font-size: 17px;
-  }
-
-  .recommended-grid {
-    gap: 9px;
-  }
-
-  .footer-links {
-    font-size: 10px;
+/* Fallback for browsers without container query support:
+   the clamp()-based fluid sizing above already scales smoothly
+   with the card's rendered width even without this block. */
+@supports not (container-type: inline-size) {
+  .ticket-container {
+    container-type: normal;
   }
 }

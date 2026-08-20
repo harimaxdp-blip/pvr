@@ -24,7 +24,7 @@ function generateTicketId() {
 
   let id = "TD";
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 3; i++) {
     id += pick(letters);
   }
 
@@ -131,272 +131,281 @@ export default function MovieTicket() {
     <main className="ticket-page">
 
       {/* =================================================
-          MAIN OUTER CARD
+          TICKET CONTAINER (NEW)
+          Wraps card + promo + footer so all three scale off
+          the SAME width reference via CSS container queries.
       ================================================= */}
 
-      <div className="ticket-card">
-
-        {/* HEADER */}
-
-        <header className="ticket-header">
-          <img
-            src={pvrLogo}
-            alt="PVR INOX"
-            className="ticket-logo"
-          />
-        </header>
-
+      <div className="ticket-container">
 
         {/* =================================================
-            TICKET CONTENT
+            MAIN OUTER CARD
         ================================================= */}
 
-        <div className="ticket-body">
+        <div className="ticket-card">
 
-          <div className="ticket-inner">
+          {/* HEADER */}
 
-            {/* THEATRE */}
-
-            <h1 className="theatre-name">
-              PVR Providence Mall Pondicherry
-            </h1>
-
-            <p className="theatre-address">
-              PVR INOX Limited., Providence Mall,4th and 5th Floor,
-              Venkatasubba Reddiyar Salai,Via Cuddalore Road, Near Malai
-              Malar,Pondicherry,Tamil Nadu 605001,Ind
-            </p>
+          <header className="ticket-header">
+            <img
+              src={pvrLogo}
+              alt="PVR INOX"
+              className="ticket-logo"
+            />
+          </header>
 
 
-            {/* MOVIE */}
+          {/* =================================================
+              TICKET CONTENT
+          ================================================= */}
 
-            <h2 className="movie-title">
-              SPIDERMAN BRAND NEW DAY (3D TAMIL) (T.B.A)
-            </h2>
+          <div className="ticket-body">
 
-            <p className="movie-rating">
-              Tamil UA 13+
-            </p>
+            <div className="ticket-inner">
 
+              {/* THEATRE */}
 
-            {/* DATE / TIME */}
+              <h1 className="theatre-name">
+                PVR Providence Mall Pondicherry
+              </h1>
 
-            <div className="info-row">
-
-              <div className="info-block">
-                <span className="info-label">
-                  Date
-                </span>
-
-                <span className="info-value">
-                  Fri, 31 Jul
-                </span>
-              </div>
+              <p className="theatre-address">
+                PVR INOX Limited., Providence Mall,4th and 5th Floor,
+                Venkatasubba Reddiyar Salai,Via Cuddalore Road, Near Malai
+                Malar,Pondicherry,Tamil Nadu 605001,Ind
+              </p>
 
 
-              <div className="info-block align-right">
-                <span className="info-label">
-                  Time
-                </span>
+              {/* MOVIE */}
 
-                <span className="info-value">
-                  1:00 PM - 4:05 PM
-                </span>
-              </div>
+              <h2 className="movie-title">
+                SPIDERMAN BRAND NEW DAY (3D TAMIL) (T.B.A)
+              </h2>
 
-            </div>
+              <p className="movie-rating">
+                Tamil UA 13+
+              </p>
 
 
-            {/* SCREEN / SEATS */}
+              {/* DATE / TIME */}
 
-            <div className="info-row screen-row">
+              <div className="info-row">
 
-              <div className="info-block">
-                <span className="info-label">
-                  Screen
-                </span>
-
-                <span className="info-value">
-                  SCREEN-2
-                </span>
-              </div>
-
-
-              <div className="info-block align-right">
-
-                <span className="info-label">
-                  Seats
-                </span>
-
-                <div className="seat-badges">
-
-                  <span className="seat-badge">
-                    M13
+                <div className="info-block">
+                  <span className="info-label">
+                    Date
                   </span>
 
-                  <span className="seat-badge">
-                    M14
+                  <span className="info-value">
+                    Fri, 31 Jul
+                  </span>
+                </div>
+
+
+                <div className="info-block align-right">
+                  <span className="info-label">
+                    Time
                   </span>
 
-                  <span className="seat-badge">
-                    M15
+                  <span className="info-value">
+                    1:00 PM - 4:05 PM
+                  </span>
+                </div>
+
+              </div>
+
+
+              {/* SCREEN / SEATS */}
+
+              <div className="info-row screen-row">
+
+                <div className="info-block">
+                  <span className="info-label">
+                    Screen
+                  </span>
+
+                  <span className="info-value">
+                    SCREEN-2
+                  </span>
+                </div>
+
+
+                <div className="info-block align-right">
+
+                  <span className="info-label">
+                    Seats
+                  </span>
+
+                  <div className="seat-badges">
+
+                    <span className="seat-badge">
+                      M13
+                    </span>
+
+                    <span className="seat-badge">
+                      M14
+                    </span>
+
+                    <span className="seat-badge">
+                      M15
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              {/* =================================================
+                  QR + TICKET ID
+              ================================================= */}
+
+              <div className="qr-row">
+
+                <div className="qr-box">
+
+                  {qrValue && (
+                    <QRCodeSVG
+                      value={qrValue}
+                      size={230}
+                      level="M"
+                      includeMargin={false}
+                    />
+                  )}
+
+                </div>
+
+
+                <div className="ticket-id-block">
+
+                  <span className="info-label">
+                    Ticket ID
+                  </span>
+
+                  <span className="ticket-id-value">
+                    {ticketId}
                   </span>
 
                 </div>
 
               </div>
 
-            </div>
 
+              {/* NOTE */}
 
-            {/* =================================================
-                QR + TICKET ID
-            ================================================= */}
-
-            <div className="qr-row">
-
-              <div className="qr-box">
-
-                {qrValue && (
-                  <QRCodeSVG
-                    value={qrValue}
-                    size={230}
-                    level="M"
-                    includeMargin={false}
-                  />
-                )}
-
-              </div>
-
-
-              <div className="ticket-id-block">
-
-                <span className="info-label">
-                  Ticket ID
+              <p className="ticket-note">
+                <span>
+                  The movie ticket invoice will be shared shortly after booking.
                 </span>
-
-                <span className="ticket-id-value">
-                  {ticketId}
-                </span>
-
-              </div>
+              </p>
 
             </div>
-
-
-            {/* NOTE */}
-
-            <p className="ticket-note">
-              <span className="note-bullet">•</span>
-              <span>
-                The movie ticket invoice will be shared shortly after booking.
-              </span>
-            </p>
 
           </div>
+
+
+          {/* =================================================
+              RECOMMENDED MOVIES
+              INSIDE OUTER CARD
+          ================================================= */}
+
+          <section className="recommended-section">
+
+            <h3 className="recommended-title">
+              Recommended Movies
+            </h3>
+
+
+            <div className="recommended-grid">
+
+              {recommendedMovies.map((movie) => (
+
+                <div
+                  className="recommended-card"
+                  key={movie.title}
+                >
+
+                  <img
+                    src={movie.image}
+                    alt={movie.title}
+                  />
+
+                </div>
+
+              ))}
+
+            </div>
+
+          </section>
 
         </div>
 
 
         {/* =================================================
-            RECOMMENDED MOVIES
-            INSIDE OUTER CARD
+            PROMO
         ================================================= */}
 
-        <section className="recommended-section">
+        <div className="promo-banner">
 
-          <h3 className="recommended-title">
-            Recommended Movies
-          </h3>
+          <img
+            src={posterSpiderman}
+            alt="Spiderman Brand New Day"
+          />
+
+        </div>
 
 
-          <div className="recommended-grid">
+        {/* =================================================
+            FOOTER
+        ================================================= */}
 
-            {recommendedMovies.map((movie) => (
+        <footer className="ticket-footer">
 
-              <div
-                className="recommended-card"
-                key={movie.title}
-              >
+          <div className="footer-icons">
 
-                <img
-                  src={movie.image}
-                  alt={movie.title}
-                />
+            <a href="#" aria-label="Facebook">
+              <SocialIcon path={ICONS.facebook} />
+            </a>
 
-              </div>
+            <a href="#" aria-label="Instagram">
+              <SocialIcon path={ICONS.instagram} />
+            </a>
 
-            ))}
+            <a href="#" aria-label="YouTube">
+              <SocialIcon path={ICONS.youtube} />
+            </a>
+
+            <a href="#" aria-label="X">
+              <SocialIcon path={ICONS.x} />
+            </a>
+
+            <a href="#" aria-label="LinkedIn">
+              <SocialIcon path={ICONS.linkedin} />
+            </a>
 
           </div>
 
-        </section>
+
+          <div className="footer-links">
+
+            <a href="#">
+              Terms &amp; Conditions
+            </a>
+
+            <a href="#">
+              FAQs
+            </a>
+
+            <a href="#">
+              Feedback/Help
+            </a>
+
+          </div>
+
+        </footer>
 
       </div>
-
-
-      {/* =================================================
-          PROMO
-      ================================================= */}
-
-      <div className="promo-banner">
-
-        <img
-          src={posterSpiderman}
-          alt="Spiderman Brand New Day"
-        />
-
-      </div>
-
-
-      {/* =================================================
-          FOOTER
-      ================================================= */}
-
-      <footer className="ticket-footer">
-
-        <div className="footer-icons">
-
-          <a href="#" aria-label="Facebook">
-            <SocialIcon path={ICONS.facebook} />
-          </a>
-
-          <a href="#" aria-label="Instagram">
-            <SocialIcon path={ICONS.instagram} />
-          </a>
-
-          <a href="#" aria-label="YouTube">
-            <SocialIcon path={ICONS.youtube} />
-          </a>
-
-          <a href="#" aria-label="X">
-            <SocialIcon path={ICONS.x} />
-          </a>
-
-          <a href="#" aria-label="LinkedIn">
-            <SocialIcon path={ICONS.linkedin} />
-          </a>
-
-        </div>
-
-
-        <div className="footer-links">
-
-          <a href="#">
-            Terms &amp; Conditions
-          </a>
-
-          <a href="#">
-            FAQs
-          </a>
-
-          <a href="#">
-            Feedback/Help
-          </a>
-
-        </div>
-
-      </footer>
 
     </main>
   );
