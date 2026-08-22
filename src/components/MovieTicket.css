@@ -201,6 +201,7 @@ a {
 
 .movie-title {
   margin: 0 0 4px;
+  padding-bottom: 15px;
 
   font-family: "Poppins", Arial, sans-serif;
   font-size: clamp(14px, 3.5cqi, 14.5px);
@@ -307,7 +308,10 @@ a {
   flex: 0 0 auto;
   min-width: 0;
 
+  width: 38px;
   height: 24px;
+  box-sizing: border-box;
+
   padding: 0 6px;
 
   display: inline-flex;
@@ -316,10 +320,11 @@ a {
 
   background: #050505;
   color: #ffffff;
+
   border-radius: 5px;
 
   font-family: "Poppins", Arial, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
   font-weight: 600;
 
@@ -394,7 +399,44 @@ a {
   border: none;
   outline: none;
 }
+.facebook-icon {
+  width: 24px;
+  height: 24px;
+  background: #000;
+  color: #fff;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: Arial, sans-serif;
+  font-size: 25px;
+  font-weight: bold;
+  line-height: 1;
+
+  border-radius: 2px;
+}
+.ticket-loading {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 24px;
+}
+
+.ticket-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #d9d9d9;
+  border-top-color: #333333;
+  border-radius: 50%;
+  animation: ticket-spin 0.7s linear infinite;
+}
+
+@keyframes ticket-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 .ticket-id-block {
   width: 20px;
   min-width: 90px;
@@ -593,8 +635,8 @@ a {
 }
 
 .footer-icons a {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -603,11 +645,10 @@ a {
 }
 
 .footer-icons svg {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: block;
 }
-
 
 /* =========================================================
    FOOTER LINKS

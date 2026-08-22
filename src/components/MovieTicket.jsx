@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { useParams } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
 import "./MovieTicket.css";
 import accessibilityBanner from "../assets/accessibility-banner.jpeg";
 import pvrLogo from "../assets/pvr-inox-logo.svg";
 
-import posterDC from "../assets/poster-dc.jpg";
+import posterDC from "../assets/22.jpg";
 import posterVishwanath from "../assets/poster-vishwanath.jpg";
 import posterGDN from "../assets/1.avif";
 import posterMakutam from "../assets/2.webp";
@@ -37,36 +39,125 @@ function generateTicketId() {
 
 
 /* =========================================================
-   QR VALUE
+   TODAY (used only as a fallback when no ticket exists yet,
+   so the QR still has a real date to encode)
 ========================================================= */
-function generateQrValue(ticketId) {
-  const random = Math.random()
-    .toString(36)
-    .slice(2, 8)
-    .toUpperCase();
 
-  return `PVRINOX-MOVIE-TICKET-${ticketId}-${random}-M13-M14-M15-SCREEN2-31JUL-1PM`;
+function getToday() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
+
+
 /* =========================================================
-   RECOMMENDED MOVIES
+   DATE FORMATTER FOR THE QR VALUE (DD-MMM-YYYY, e.g. 31-Jul-2026)
+   DB stores dates as "YYYY-MM-DD".
 ========================================================= */
 
-const recommendedMovies = [
+function formatDateForQr(dateStr) {
+  if (!dateStr) return "";
+
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const dateObj = new Date(year, month - 1, day);
+
+  if (isNaN(dateObj.getTime())) return dateStr;
+
+  const monthNames = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  ];
+
+  const dd = String(day).padStart(2, "0");
+
+  return `${dd}-${monthNames[month - 1]}-${year}`;
+}
+
+
+/* =========================================================
+   QR VALUE
+   Format: TICKETID,REFNUMBER,DD-MMM-YYYY,HH:MM
+   e.g. "TDAAA9R,18971,31-Jul-2026,13:00"
+========================================================= */
+function generateQrValue(ticketId, dateStr, startTime) {
+  const refNumber = String(
+    Math.floor(10000 + Math.random() * 90000)
+  );
+
+  const formattedDate = formatDateForQr(dateStr);
+
+  return `${ticketId},${refNumber},${formattedDate},${startTime || ""}`;
+}
+
+/* =========================================================
+   DATE / TIME FORMATTERS (DB stores "YYYY-MM-DD" / "HH:MM")
+========================================================= */
+
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const dateObj = new Date(year, month - 1, day);
+
+  if (isNaN(dateObj.getTime())) return dateStr;
+
+  return dateObj.toLocaleDateString("en-US", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function formatTime(timeStr) {
+  if (!timeStr) return "";
+
+  const [hourStr, minuteStr] = timeStr.split(":");
+  let hour = Number(hourStr);
+  const minute = minuteStr;
+
+  const period = hour >= 12 ? "PM" : "AM";
+
+  hour = hour % 12;
+  if (hour === 0) hour = 12;
+
+  return `${hour}:${minute} ${period}`;
+}
+
+function formatTimeRange(startTime, endTime) {
+  if (!startTime && !endTime) return "";
+
+  return `${formatTime(startTime)} - ${formatTime(endTime)}`;
+}
+
+
+/* =========================================================
+   DEFAULT RECOMMENDED MOVIES (fallback if DB has none)
+========================================================= */
+
+const defaultRecommendedMovies = [
   {
-    title: "DC",
+    title: "Spider-Man: Brand New Day",
     image: posterSpiderman,
+    url: "https://www.pvrcinemas.com/moviesessions/Pondicherry/SPIDERMAN-BRAND-NEW-DAY/35294",
   },
   {
     title: "Vishwanath & Sons",
     image: posterVishwanath,
+    url: "https://www.pvrcinemas.com/moviesessions/VISHWANATH-AND-SONS/37571",
   },
   {
     title: "G.D.N",
     image: posterGDN,
+    url: "https://www.pvrcinemas.com/moviesessions/Pondicherry/RAM-AND-LEELA/38397",
   },
   {
     title: "Makutam",
     image: posterMakutam,
+    url: "https://www.pvrcinemas.com/moviesessions/Pondicherry/MODHA-RATHRI/38398",
   },
 ];
 
@@ -119,13 +210,104 @@ export default function MovieTicket() {
 
   const [ticketId, setTicketId] = useState("");
   const [qrValue, setQrValue] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // -----------------------------------------------------
+  // TICKET DATA FROM FIRESTORE
+  // -----------------------------------------------------
+
+  const [ticketData, setTicketData] = useState({
+    theatreName: "",
+    theatreAddress: "",
+    movieTitle: "",
+    date: "",
+    startTime: "",
+    endTime: "",
+    screen: "",
+    seats: [],
+    promoImage: "",
+    recommendedMovies: defaultRecommendedMovies,
+  });
+
+  // -----------------------------------------------------
+  // LOAD TICKET FROM DB
+  // -----------------------------------------------------
 
   useEffect(() => {
-    const id = generateTicketId();
+    async function loadTicket() {
+      try {
+        const ticketRef = doc(db, "tickets", "current");
+        const snapshot = await getDoc(ticketRef);
 
-    setTicketId(id);
-    setQrValue(generateQrValue(id));
+        if (!snapshot.exists()) {
+          const fallbackId = generateTicketId();
+          setTicketId(fallbackId);
+          setQrValue(generateQrValue(fallbackId, getToday(), ""));
+          return;
+        }
+
+        const data = snapshot.data();
+
+        let loadedSeats = [];
+        if (Array.isArray(data.seats)) {
+          loadedSeats = data.seats;
+        } else if (data.seats) {
+          loadedSeats = Object.values(data.seats);
+        }
+
+        let loadedRecommended = [];
+        if (Array.isArray(data.recommendedMovies)) {
+          loadedRecommended = data.recommendedMovies;
+        } else if (data.recommendedMovies) {
+          loadedRecommended = Object.values(data.recommendedMovies);
+        }
+
+        // Only replace recommended movies if the DB actually has some
+        // with an image set, so an empty admin form doesn't blank the grid
+        const recommendedToUse = loadedRecommended.some((m) => m && m.image)
+          ? loadedRecommended.filter((m) => m && m.image)
+          : defaultRecommendedMovies;
+
+        setTicketData({
+          theatreName: data.theatreName || "",
+          theatreAddress: data.theatreAddress || "",
+          movieTitle: data.movieTitle || "",
+          date: data.date || "",
+          startTime: data.startTime || "",
+          endTime: data.endTime || "",
+          screen: data.screen || "",
+          seats: loadedSeats,
+          promoImage: data.promoImage || "",
+          recommendedMovies: recommendedToUse,
+        });
+
+        const finalId = data.ticketId || generateTicketId();
+        setTicketId(finalId);
+        setQrValue(generateQrValue(finalId, data.date, data.startTime));
+      } catch (error) {
+        console.error("TICKET LOAD ERROR:", error);
+        const fallbackId = generateTicketId();
+        setTicketId(fallbackId);
+        setQrValue(generateQrValue(fallbackId, getToday(), ""));
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadTicket();
   }, []);
+
+  // Don't paint anything until the real DB data has arrived —
+  // this is what stops the old/default values from flashing on screen.
+  if (loading) {
+    return (
+      <main className="ticket-page">
+        <div className="ticket-loading">
+          <span className="ticket-spinner" />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="ticket-page">
@@ -166,20 +348,18 @@ export default function MovieTicket() {
               {/* THEATRE */}
 
               <h1 className="theatre-name">
-                PVR Providence Mall Pondicherry
+                {ticketData.theatreName}
               </h1>
 
               <p className="theatre-address">
-                PVR INOX Limited., Providence Mall,4th and 5th Floor,
-                Venkatasubba Reddiyar Salai,Via Cuddalore Road, Near Malai
-                Malar,Pondicherry,Tamil Nadu 605001,Ind
+                {ticketData.theatreAddress}
               </p>
 
 
               {/* MOVIE */}
 
               <h2 className="movie-title">
-                DC (Tamil with English Subtitle) (T.B.A)
+                {ticketData.movieTitle}
               </h2>
 {/* MOVIE 
               <p className="movie-rating">
@@ -197,7 +377,7 @@ export default function MovieTicket() {
                   </span>
 
                   <span className="info-value">
-                    Thu, 20 Aug
+                    {formatDate(ticketData.date)}
                   </span>
                 </div>
 
@@ -208,7 +388,7 @@ export default function MovieTicket() {
                   </span>
 
                   <span className="info-value">
-                    10:20 PM - 1:24 AM
+                    {formatTimeRange(ticketData.startTime, ticketData.endTime)}
                   </span>
                 </div>
 
@@ -225,7 +405,7 @@ export default function MovieTicket() {
                   </span>
 
                   <span className="info-value">
-                    SCREEN-5
+                    {ticketData.screen}
                   </span>
                 </div>
 
@@ -238,13 +418,11 @@ export default function MovieTicket() {
 
                   <div className="seat-badges">
 
-                    <span className="seat-badge">
-                      K22
-                    </span>
-
-                    <span className="seat-badge">
-                    K23
-                    </span>
+                    {ticketData.seats.map((seat) => (
+                      <span className="seat-badge" key={seat}>
+                        {seat}
+                      </span>
+                    ))}
 
                   </div>
 
@@ -288,11 +466,7 @@ export default function MovieTicket() {
 
               {/* NOTE */}
 
-              <p className="ticket-note">
-                <span>
-                  The movie ticket invoice will be shared shortly after booking.
-                </span>
-              </p>
+             
 
             </div>
 
@@ -323,19 +497,18 @@ export default function MovieTicket() {
 
             <div className="recommended-grid">
 
-              {recommendedMovies.map((movie) => (
+              {ticketData.recommendedMovies.map((movie, index) => (
 
                 <div
-                  className="recommended-card"
-                  key={movie.title}
-                >
-
-                  <img
-                    src={movie.image}
-                    alt={movie.title}
-                  />
-
-                </div>
+  className="recommended-card"
+  key={movie.title || movie.url || index}
+  onClick={() => window.open(movie.url, "_blank")}
+>
+  <img
+    src={movie.image}
+    alt={movie.title || `Recommended movie ${index + 1}`}
+  />
+</div>
 
               ))}
 
@@ -353,8 +526,8 @@ export default function MovieTicket() {
         <div className="promo-banner">
 
           <img
-            src={posterDC}
-            alt="Spiderman Brand New Day"
+            src={ticketData.promoImage || posterDC}
+            alt="Promo banner"
           />
 
         </div>
@@ -368,44 +541,81 @@ export default function MovieTicket() {
 
           <div className="footer-icons">
 
-            <a href="#" aria-label="Facebook">
-              <SocialIcon path={ICONS.facebook} />
-            </a>
+ 
+ <a href="https://www.facebook.com/moviesatpvr"
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Facebook"
+  className="facebook-link"
+>
+  <span className="facebook-icon">f</span>
+</a>
 
-            <a href="#" aria-label="Instagram">
-              <SocialIcon path={ICONS.instagram} />
-            </a>
+  
+ <a   href="https://www.instagram.com/pvrcinemas_official"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Instagram"
+  >
+    <SocialIcon path={ICONS.instagram} />
+  </a>
 
-            <a href="#" aria-label="YouTube">
-              <SocialIcon path={ICONS.youtube} />
-            </a>
+  
+  <a  href="https://www.youtube.com/user/PVRChannel"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="YouTube"
+  >
+    <SocialIcon path={ICONS.youtube} />
+  </a>
 
-            <a href="#" aria-label="X">
-              <SocialIcon path={ICONS.x} />
-            </a>
+  
+  <a  href="https://x.com/_PVRCinemas"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="X"
+  >
+    <SocialIcon path={ICONS.x} />
+  </a>
 
-            <a href="#" aria-label="LinkedIn">
-              <SocialIcon path={ICONS.linkedin} />
-            </a>
+  
+   <a href="https://www.linkedin.com/company/pvr-limited/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <SocialIcon path={ICONS.linkedin} />
+  </a>
 
-          </div>
+</div>
 
 
           <div className="footer-links">
 
-            <a href="#">
-              Terms &amp; Conditions
-            </a>
+  
+  <a  href="https://www.pvrcinemas.com/terms-conditions/booking"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Terms &amp; Conditions
+  </a>
 
-            <a href="#">
-              FAQs
-            </a>
+  
+   <a href="https://www.pvrcinemas.com/faq"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    FAQs
+  </a>
 
-            <a href="#">
-              Feedback/Help
-            </a>
+  
+   <a href="https://pvrorigin-www.pvrcinemas.com/feedback"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Feedback/Help
+  </a>
 
-          </div>
+</div>
 
         </footer>
 
